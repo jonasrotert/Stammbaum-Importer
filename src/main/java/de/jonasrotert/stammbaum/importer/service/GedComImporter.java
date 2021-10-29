@@ -53,19 +53,19 @@ public class GedComImporter {
 	}
 
 	private void extractBirthday(final String line, final Person person, final int personLineNumber) {
-		LOGGER.info("Searching for birthday in line {}", personLineNumber);
+		LOGGER.debug("Searching for birthday in line {}", personLineNumber);
 		final Date birthday = this.extractDate(line);
 
 		if (birthday != null) {
 			person.setBirthday(birthday);
 			LOGGER.info("Extracted birthday {} in line {}", person.getBirthday().toString(), personLineNumber);
 		} else {
-			LOGGER.warn("Could not extract birthday from in line {}", personLineNumber);
+			LOGGER.debug("Could not extract birthday in line {}", personLineNumber);
 		}
 	}
 
 	private void extractBirthInformation(final List<String> lines, final String line, final Person person, final int personLineNumber) {
-		LOGGER.info("Searching for birth information in line {}", personLineNumber);
+		LOGGER.debug("Searching for birth information in line {}", personLineNumber);
 		final String regex = "1\\sBIRT";
 		final Pattern pattern = Pattern.compile(regex, Pattern.MULTILINE);
 		final Matcher matcher = pattern.matcher(line);
@@ -80,24 +80,24 @@ public class GedComImporter {
 			} while (birthinformationLine + 1 < lines.size() && lines.get(birthinformationLine + 1).startsWith("2"));
 
 		} else {
-			LOGGER.info("Could not extract birth information from in line {}", personLineNumber);
+			LOGGER.debug("Could not extract birth information in line {}", personLineNumber);
 		}
 	}
 
 	private void extractBirthplace(final String line, final Person person, final int personLineNumber) {
-		LOGGER.info("Searching for birthplace in line {}", personLineNumber);
+		LOGGER.debug("Searching for birthplace in line {}", personLineNumber);
 		final String birthplace = this.extractPlace(line);
 
 		if (birthplace != null) {
 			person.setBirthplace(birthplace);
 			LOGGER.info("Extracted birthplace {} in line {}", person.getBirthplace(), personLineNumber);
 		} else {
-			LOGGER.warn("Could not extract birthplace from in line {}", personLineNumber);
+			LOGGER.debug("Could not extract birthplace in line {}", personLineNumber);
 		}
 	}
 
 	private void extractBurialInformation(final List<String> lines, final String line, final Person person, final int personLineNumber) {
-		LOGGER.info("Searching for burial information in line {}", personLineNumber);
+		LOGGER.debug("Searching for burial information in line {}", personLineNumber);
 		final String regex = "1\\sBURI";
 		final Pattern pattern = Pattern.compile(regex, Pattern.MULTILINE);
 		final Matcher matcher = pattern.matcher(line);
@@ -112,19 +112,19 @@ public class GedComImporter {
 			} while (burialInformationLine + 1 < lines.size() && lines.get(burialInformationLine + 1).startsWith("2"));
 
 		} else {
-			LOGGER.info("Could not extract burial information from in line {}", personLineNumber);
+			LOGGER.debug("Could not extract burial information in line {}", personLineNumber);
 		}
 	}
 
 	private void extractBurialPlace(final String line, final Person person, final int personLineNumber) {
-		LOGGER.info("Searching for burial place in line {}", personLineNumber);
+		LOGGER.debug("Searching for burial place in line {}", personLineNumber);
 		final String burialplace = this.extractPlace(line);
 
 		if (burialplace != null) {
 			person.setBurialPlace(burialplace);
 			LOGGER.info("Extracted burial place {} in line {}", person.getBurialPlace(), personLineNumber);
 		} else {
-			LOGGER.warn("Could not extract burial place from in line {}", personLineNumber);
+			LOGGER.debug("Could not extract burial place in line {}", personLineNumber);
 		}
 	}
 
@@ -149,31 +149,31 @@ public class GedComImporter {
 	}
 
 	private void extractDayOfBurial(final String line, final Person person, final int personLineNumber) {
-		LOGGER.info("Searching for day of burial in line {}", personLineNumber);
+		LOGGER.debug("Searching for day of burial in line {}", personLineNumber);
 		final Date dayOfBurial = this.extractDate(line);
 
 		if (dayOfBurial != null) {
 			person.setBuried(dayOfBurial);
 			LOGGER.info("Extracted day of burial {} in line {}", person.getBuried().toString(), personLineNumber);
 		} else {
-			LOGGER.warn("Could not extract day of burial from in line {}", personLineNumber);
+			LOGGER.debug("Could not extract day of burial in line {}", personLineNumber);
 		}
 	}
 
 	private void extractDayOfDeath(final String line, final Person person, final int personLineNumber) {
-		LOGGER.info("Searching for day of death in line {}", personLineNumber);
+		LOGGER.debug("Searching for day of death in line {}", personLineNumber);
 		final Date dayOfDeath = this.extractDate(line);
 
 		if (dayOfDeath != null) {
 			person.setDayOfDeath(dayOfDeath);
 			LOGGER.info("Extracted day of death {} in line {}", person.getDayOfDeath().toString(), personLineNumber);
 		} else {
-			LOGGER.warn("Could not extract day of death from in line {}", personLineNumber);
+			LOGGER.debug("Could not extract day of death in line {}", personLineNumber);
 		}
 	}
 
 	private void extractDeathInformation(final List<String> lines, final String line, final Person person, final int personLineNumber) {
-		LOGGER.info("Searching for death information in line {}", personLineNumber);
+		LOGGER.debug("Searching for death information in line {}", personLineNumber);
 		final String regex = "1\\sDEAT";
 		final Pattern pattern = Pattern.compile(regex, Pattern.MULTILINE);
 		final Matcher matcher = pattern.matcher(line);
@@ -188,7 +188,7 @@ public class GedComImporter {
 			} while (birthinformationLine + 1 < lines.size() && lines.get(birthinformationLine + 1).startsWith("2"));
 
 		} else {
-			LOGGER.info("Could not extract death information from in line {}", personLineNumber);
+			LOGGER.debug("Could not extract death information in line {}", personLineNumber);
 		}
 	}
 
@@ -203,7 +203,7 @@ public class GedComImporter {
 			person.setLastName(matcher.group("lastName"));
 			LOGGER.info("Extracted firstName {} and lastName {} in line {}", person.getFirstName(), person.getLastName(), personLineNumber);
 		} else {
-			LOGGER.debug("Could not extract name from in line {}", personLineNumber);
+			LOGGER.debug("Could not extract name in line {}", personLineNumber);
 		}
 	}
 
@@ -217,7 +217,7 @@ public class GedComImporter {
 			person.setOccupation(matcher.group("occupation"));
 			LOGGER.info("Extracted occupation {} in line {}", person.getOccupation(), personLineNumber);
 		} else {
-			LOGGER.debug("Could not extract occupation from in line {}", personLineNumber);
+			LOGGER.debug("Could not extract occupation in line {}", personLineNumber);
 		}
 	}
 
@@ -234,14 +234,14 @@ public class GedComImporter {
 	}
 
 	private void extractPlaceOfDeath(final String line, final Person person, final int personLineNumber) {
-		LOGGER.info("Searching for place of death in line {}", personLineNumber);
+		LOGGER.debug("Searching for place of death in line {}", personLineNumber);
 		final String placeOfDeath = this.extractPlace(line);
 
 		if (placeOfDeath != null) {
 			person.setPlaceOfDeath(placeOfDeath);
 			LOGGER.info("Extracted place of Death {} in line {}", person.getPlaceOfDeath(), personLineNumber);
 		} else {
-			LOGGER.warn("Could not extract place of death from in line {}", personLineNumber);
+			LOGGER.debug("Could not extract place of death in line {}", personLineNumber);
 		}
 	}
 
@@ -253,9 +253,9 @@ public class GedComImporter {
 
 		if (matcher.find()) {
 			person.setSex(matcher.group("sex"));
-			LOGGER.debug("Extracted sex {} in line {}", person.getSex(), personLineNumber);
+			LOGGER.info("Extracted sex {} in line {}", person.getSex(), personLineNumber);
 		} else {
-			LOGGER.debug("Could not extract sex from in line {}", personLineNumber);
+			LOGGER.debug("Could not extract sex in line {}", personLineNumber);
 		}
 	}
 
