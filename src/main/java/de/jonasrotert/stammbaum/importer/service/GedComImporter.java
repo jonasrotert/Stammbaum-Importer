@@ -6,6 +6,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
@@ -42,6 +43,7 @@ public class GedComImporter {
 					this.extractName(lines.get(personLineNumber), person, personLineNumber);
 					this.extractSex(lines.get(personLineNumber), person, personLineNumber);
 					this.extractBirthInformation(lines, lines.get(personLineNumber), person, personLineNumber);
+					this.extractDeathInformation(lines, lines.get(personLineNumber), person, personLineNumber);
 				} while (personLineNumber + 1 < lines.size() && !lines.get(personLineNumber + 1).startsWith("0"));
 
 			}
@@ -50,22 +52,13 @@ public class GedComImporter {
 
 	private void extractBirthday(final String line, final Person person, final int personLineNumber) {
 		LOGGER.info("Searching for birthday in line {}", personLineNumber);
-		final String regex = "2\\sDATE\\s(?<date>\\d+\\s\\w+\\s\\d+)";
-		final Pattern pattern = Pattern.compile(regex, Pattern.MULTILINE);
-		final Matcher matcher = pattern.matcher(line);
+		final Date birthday = this.extractDate(line);
 
-		if (matcher.find()) {
-
-			final String extractedDate = matcher.group("date");
-			final SimpleDateFormat formatter = new SimpleDateFormat("d MMM yyyy", Locale.ENGLISH);
-			try {
-				person.setBirthday(formatter.parse(extractedDate));
-				LOGGER.info("Extracted birthday {} in line {}", person.getBirthday().toString(), personLineNumber);
-			} catch (final ParseException e) {
-				LOGGER.error("Unabled to parse date {}!", extractedDate);
-			}
+		if (birthday != null) {
+			person.setBirthday(birthday);
+			LOGGER.info("Extracted birthday {} in line {}", person.getBirthday().toString(), personLineNumber);
 		} else {
-			LOGGER.warn("Could not extract name from in line {}", personLineNumber);
+			LOGGER.warn("Could not extract birthday from in line {}", personLineNumber);
 		}
 	}
 
@@ -101,6 +94,58 @@ public class GedComImporter {
 		}
 	}
 
+	private Date extractDate(final String line) {
+		final String regex = "2\\sDATE\\s(?<date>\\d+\\s\\w+\\s\\d+)";
+		final Pattern pattern = Pattern.compile(regex, Pattern.MULTILINE);
+		final Matcher matcher = pattern.matcher(line);
+
+		if (matcher.find()) {
+
+			final String extractedDate = matcher.group("date");
+			final SimpleDateFormat formatter = new SimpleDateFormat("d MMM yyyy", Locale.ENGLISH);
+			try {
+				return formatter.parse(extractedDate);
+
+			} catch (final ParseException e) {
+				LOGGER.error("Unabled to parse date {}!", extractedDate);
+			}
+		}
+
+		return null;
+	}
+
+	private void extractDayOfDeath(final String line, final Person person, final int personLineNumber) {
+		LOGGER.info("Searching for day of death in line {}", personLineNumber);
+		final Date dayOfDeath = this.extractDate(line);
+
+		if (dayOfDeath != null) {
+			person.setDayOfDeath(dayOfDeath);
+			LOGGER.info("Extracted day of death {} in line {}", person.getDayOfDeath().toString(), personLineNumber);
+		} else {
+			LOGGER.warn("Could not extract day of death from in line {}", personLineNumber);
+		}
+	}
+
+	private void extractDeathInformation(final List<String> lines, final String line, final Person person, final int personLineNumber) {
+		LOGGER.info("Searching for death information in line {}", personLineNumber);
+		final String regex = "1\\sDEAT";
+		final Pattern pattern = Pattern.compile(regex, Pattern.MULTILINE);
+		final Matcher matcher = pattern.matcher(line);
+
+		if (matcher.find()) {
+			int birthinformationLine = personLineNumber;
+
+			do {
+				birthinformationLine++;
+				this.extractDayOfDeath(lines.get(birthinformationLine), person, birthinformationLine);
+				this.extractPlaceOfDeath(lines.get(birthinformationLine), person, birthinformationLine);
+			} while (birthinformationLine + 1 < lines.size() && lines.get(birthinformationLine + 1).startsWith("2"));
+
+		} else {
+			LOGGER.info("Could not extract death information from in line {}", personLineNumber);
+		}
+	}
+
 	private void extractName(final String line, final Person person, final int personLineNumber) {
 		LOGGER.debug("Searching for name in line {}", personLineNumber);
 		final String regex = "1\\sNAME\\s(?<firstName>.+)\\s\\/(?<lastName>.+)\\/";
@@ -125,6 +170,18 @@ public class GedComImporter {
 			return matcher.group("place");
 		} else {
 			return null;
+		}
+	}
+
+	private void extractPlaceOfDeath(final String line, final Person person, final int personLineNumber) {
+		LOGGER.info("Searching for place of death in line {}", personLineNumber);
+		final String placeOfDeath = this.extractPlace(line);
+
+		if (placeOfDeath != null) {
+			person.setPlaceOfDeath(placeOfDeath);
+			LOGGER.info("Extracted place of Death {} in line {}", person.getPlaceOfDeath(), personLineNumber);
+		} else {
+			LOGGER.warn("Could not extract place of death from in line {}", personLineNumber);
 		}
 	}
 
