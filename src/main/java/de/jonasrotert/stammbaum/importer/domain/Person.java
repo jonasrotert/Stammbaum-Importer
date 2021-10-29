@@ -24,7 +24,11 @@ public class Person {
 
 	private String birthplace;
 
-	private String deathNotice;
+	private String burialPlace;
+
+	private Date buried;
+
+	private String causeOfDeath;
 
 	@Relationship(type = "FATHER")
 	private Person father;
@@ -50,6 +54,8 @@ public class Person {
 	private Person mother;
 
 	private String name;
+
+	private String placeOfDeath;
 
 	private String sex;
 }
