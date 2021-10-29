@@ -31,6 +31,8 @@ public class Person {
 
 	private String firstName;
 
+	private String gedcodmID;
+
 	private String generalNotice;
 
 	private String givenName;
