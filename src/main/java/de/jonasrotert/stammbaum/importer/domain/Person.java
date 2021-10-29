@@ -57,6 +57,8 @@ public class Person {
 
 	private String name;
 
+	private String occupation;
+
 	private String placeOfDeath;
 
 	private String sex;
