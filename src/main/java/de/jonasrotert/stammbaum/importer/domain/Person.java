@@ -30,6 +30,8 @@ public class Person {
 
 	private String causeOfDeath;
 
+	private Date dayOfDeath;
+
 	@Relationship(type = "FATHER")
 	private Person father;
 
