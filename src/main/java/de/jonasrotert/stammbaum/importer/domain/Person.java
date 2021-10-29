@@ -1,10 +1,7 @@
 package de.jonasrotert.stammbaum.importer.domain;
 
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Optional;
+import java.util.Date;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.springframework.data.neo4j.core.schema.GeneratedValue;
 import org.springframework.data.neo4j.core.schema.Id;
@@ -14,34 +11,43 @@ import org.springframework.data.neo4j.core.schema.Relationship;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Node
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@ToString
 public class Person {
+
+	private Date birthday;
+
+	private String birthplace;
+
+	private String deathNotice;
+
+	@Relationship(type = "FATHER")
+	private Person father;
+
+	private String firstName;
+
+	private String generalNotice;
+
+	private String givenName;
 
 	@Id
 	@GeneratedValue
 	private Long id;
 
+	private String lastName;
+
+	@Relationship(type = "MARRIAGED_TO")
+	private Set<Person> marriagedTo;
+
+	@Relationship(type = "MOTHER")
+	private Person mother;
+
 	private String name;
 
-	@Relationship(type = "TEAMMATE")
-	public Set<Person> teammates;
-
-	@Override
-	public String toString() {
-
-		return this.name + "'s teammates => " + Optional.ofNullable(this.teammates).orElse(Collections.emptySet()).stream().map(Person::getName).collect(Collectors.toList());
-
-	}
-
-	public void worksWith(final Person person) {
-		if (this.teammates == null) {
-			this.teammates = new HashSet<>();
-		}
-		this.teammates.add(person);
-	}
-
+	private String sex;
 }
