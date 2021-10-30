@@ -272,14 +272,15 @@ public class GedComImporter {
 		return null;
 	}
 
-	public void importFile(final String fileName) {
+	public List<Person> importFile(final String fileName) {
 		final Path path = Paths.get(fileName);
 		final List<Person> persons = new LinkedList<>();
 		try (Stream<String> stream = Files.lines(path)) {
 			this.analyzeList(stream.collect(Collectors.toList()), persons);
-			LOGGER.info("Found {} person(s)", persons.size());
 		} catch (final IOException e) {
 			LOGGER.error(e.getStackTrace().toString());
 		}
+
+		return persons;
 	}
 }
