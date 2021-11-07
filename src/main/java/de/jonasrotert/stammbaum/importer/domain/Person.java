@@ -1,12 +1,14 @@
 package de.jonasrotert.stammbaum.importer.domain;
 
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Set;
 
 import org.springframework.data.neo4j.core.schema.GeneratedValue;
 import org.springframework.data.neo4j.core.schema.Id;
 import org.springframework.data.neo4j.core.schema.Node;
 import org.springframework.data.neo4j.core.schema.Relationship;
+import org.springframework.data.neo4j.core.schema.Relationship.Direction;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -32,12 +34,12 @@ public class Person {
 
 	private Date dayOfDeath;
 
-	@Relationship(type = "FATHER")
-	private Person father;
+	@Relationship(type = "STARTED_FAMILY", direction = Direction.OUTGOING)
+	private Set<Family> families = new HashSet<>();
 
 	private String firstName;
 
-	private String gedcodmID;
+	private String gedcomID;
 
 	private String generalNotice;
 
@@ -49,12 +51,6 @@ public class Person {
 
 	private String lastName;
 
-	@Relationship(type = "MARRIAGED_TO")
-	private Set<Person> marriagedTo;
-
-	@Relationship(type = "MOTHER")
-	private Person mother;
-
 	private String name;
 
 	private String occupation;
@@ -62,4 +58,14 @@ public class Person {
 	private String placeOfDeath;
 
 	private String sex;
+
+	public void setFirstName(final String firstName) {
+		this.firstName = firstName;
+		this.setName(this.getFirstName() + " " + this.getLastName());
+	}
+
+	public void setLastName(final String lastName) {
+		this.lastName = lastName;
+		this.setName(this.getFirstName() + " " + this.getLastName());
+	}
 }

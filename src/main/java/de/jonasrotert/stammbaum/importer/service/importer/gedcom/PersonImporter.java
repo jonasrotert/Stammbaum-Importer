@@ -1,4 +1,4 @@
-package de.jonasrotert.stammbaum.importer.service;
+package de.jonasrotert.stammbaum.importer.service.importer.gedcom;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -7,9 +7,10 @@ import java.nio.file.Paths;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.LinkedList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -22,11 +23,11 @@ import org.springframework.stereotype.Component;
 import de.jonasrotert.stammbaum.importer.domain.Person;
 
 @Component
-public class GedComImporter {
+public class PersonImporter {
 
-	private static Logger LOGGER = LoggerFactory.getLogger(GedComImporter.class);
+	private static Logger LOGGER = LoggerFactory.getLogger(PersonImporter.class);
 
-	private void analyzeList(final List<String> lines, final List<Person> persons) {
+	private void analyzeList(final List<String> lines, final Map<String, Person> persons) {
 
 		for (int i = 0; i < lines.size(); i++) {
 			final String line = lines.get(i);
@@ -35,8 +36,8 @@ public class GedComImporter {
 				LOGGER.debug("Found header {} in line {}", gedcomId, i);
 				int personLineNumber = i;
 				final Person person = new Person();
-				person.setGedcodmID(gedcomId);
-				persons.add(person);
+				person.setGedcomID(gedcomId);
+				persons.put(gedcomId, person);
 				do {
 					personLineNumber++;
 
@@ -47,7 +48,7 @@ public class GedComImporter {
 					this.extractDeathInformation(lines, lines.get(personLineNumber), person, personLineNumber);
 					this.extractBurialInformation(lines, lines.get(personLineNumber), person, personLineNumber);
 				} while (personLineNumber + 1 < lines.size() && !lines.get(personLineNumber + 1).startsWith("0"));
-
+				LOGGER.debug("Extracted person with gedcom-id {} : {}", gedcomId, person.getName());
 			}
 		}
 	}
@@ -58,7 +59,7 @@ public class GedComImporter {
 
 		if (birthday != null) {
 			person.setBirthday(birthday);
-			LOGGER.info("Extracted birthday {} in line {}", person.getBirthday().toString(), personLineNumber);
+			LOGGER.debug("Extracted birthday {} in line {}", person.getBirthday().toString(), personLineNumber);
 		} else {
 			LOGGER.debug("Could not extract birthday in line {}", personLineNumber);
 		}
@@ -90,7 +91,7 @@ public class GedComImporter {
 
 		if (birthplace != null) {
 			person.setBirthplace(birthplace);
-			LOGGER.info("Extracted birthplace {} in line {}", person.getBirthplace(), personLineNumber);
+			LOGGER.debug("Extracted birthplace {} in line {}", person.getBirthplace(), personLineNumber);
 		} else {
 			LOGGER.debug("Could not extract birthplace in line {}", personLineNumber);
 		}
@@ -122,7 +123,7 @@ public class GedComImporter {
 
 		if (burialplace != null) {
 			person.setBurialPlace(burialplace);
-			LOGGER.info("Extracted burial place {} in line {}", person.getBurialPlace(), personLineNumber);
+			LOGGER.debug("Extracted burial place {} in line {}", person.getBurialPlace(), personLineNumber);
 		} else {
 			LOGGER.debug("Could not extract burial place in line {}", personLineNumber);
 		}
@@ -154,7 +155,7 @@ public class GedComImporter {
 
 		if (dayOfBurial != null) {
 			person.setBuried(dayOfBurial);
-			LOGGER.info("Extracted day of burial {} in line {}", person.getBuried().toString(), personLineNumber);
+			LOGGER.debug("Extracted day of burial {} in line {}", person.getBuried().toString(), personLineNumber);
 		} else {
 			LOGGER.debug("Could not extract day of burial in line {}", personLineNumber);
 		}
@@ -166,7 +167,7 @@ public class GedComImporter {
 
 		if (dayOfDeath != null) {
 			person.setDayOfDeath(dayOfDeath);
-			LOGGER.info("Extracted day of death {} in line {}", person.getDayOfDeath().toString(), personLineNumber);
+			LOGGER.debug("Extracted day of death {} in line {}", person.getDayOfDeath().toString(), personLineNumber);
 		} else {
 			LOGGER.debug("Could not extract day of death in line {}", personLineNumber);
 		}
@@ -201,7 +202,7 @@ public class GedComImporter {
 		if (matcher.find()) {
 			person.setFirstName(matcher.group("firstName"));
 			person.setLastName(matcher.group("lastName"));
-			LOGGER.info("Extracted firstName {} and lastName {} in line {}", person.getFirstName(), person.getLastName(), personLineNumber);
+			LOGGER.debug("Extracted firstName {} and lastName {} in line {}", person.getFirstName(), person.getLastName(), personLineNumber);
 		} else {
 			LOGGER.debug("Could not extract name in line {}", personLineNumber);
 		}
@@ -215,7 +216,7 @@ public class GedComImporter {
 
 		if (matcher.find()) {
 			person.setOccupation(matcher.group("occupation"));
-			LOGGER.info("Extracted occupation {} in line {}", person.getOccupation(), personLineNumber);
+			LOGGER.debug("Extracted occupation {} in line {}", person.getOccupation(), personLineNumber);
 		} else {
 			LOGGER.debug("Could not extract occupation in line {}", personLineNumber);
 		}
@@ -239,7 +240,7 @@ public class GedComImporter {
 
 		if (placeOfDeath != null) {
 			person.setPlaceOfDeath(placeOfDeath);
-			LOGGER.info("Extracted place of Death {} in line {}", person.getPlaceOfDeath(), personLineNumber);
+			LOGGER.debug("Extracted place of Death {} in line {}", person.getPlaceOfDeath(), personLineNumber);
 		} else {
 			LOGGER.debug("Could not extract place of death in line {}", personLineNumber);
 		}
@@ -253,7 +254,7 @@ public class GedComImporter {
 
 		if (matcher.find()) {
 			person.setSex(matcher.group("sex"));
-			LOGGER.info("Extracted sex {} in line {}", person.getSex(), personLineNumber);
+			LOGGER.debug("Extracted sex {} in line {}", person.getSex(), personLineNumber);
 		} else {
 			LOGGER.debug("Could not extract sex in line {}", personLineNumber);
 		}
@@ -272,9 +273,9 @@ public class GedComImporter {
 		return null;
 	}
 
-	public List<Person> importFile(final String fileName) {
+	public Map<String, Person> importFile(final String fileName) {
 		final Path path = Paths.get(fileName);
-		final List<Person> persons = new LinkedList<>();
+		final Map<String, Person> persons = new HashMap();
 		try (Stream<String> stream = Files.lines(path)) {
 			this.analyzeList(stream.collect(Collectors.toList()), persons);
 		} catch (final IOException e) {

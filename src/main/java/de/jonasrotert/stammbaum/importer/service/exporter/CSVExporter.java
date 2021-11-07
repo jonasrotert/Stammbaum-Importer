@@ -1,4 +1,4 @@
-package de.jonasrotert.stammbaum.importer.service;
+package de.jonasrotert.stammbaum.importer.service.exporter;
 
 import java.io.FileWriter;
 import java.io.IOException;
