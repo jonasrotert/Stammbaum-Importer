@@ -29,3 +29,12 @@ hs_err_pid*
 *.csv
 *.ged
 *.txt
+.settings
+target
+genealogy-backend/.DS_Store
+genealogy-backend/.classpath
+genealogy-backend/.project
+genealogy-importer/src/main/.DS_Store
+.DS_Store
+.classpath
+.project

@@ -1,0 +1,6 @@
+package de.jonasrotert.stammbaum.importer.domain;
+
+public enum FamilyEventType
+{
+    ANNULMENT, CENSUS, DIVORCE, DIVORCE_FILED, ENGAGEMENT, EVENT, MARRIAGE, MARRIAGE_BANNER, MARRIAGE_CONTRACT, MARRIAGE_LICENSE, MARRIAGE_SETTLEMENT;
+}
