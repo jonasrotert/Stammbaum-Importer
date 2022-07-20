@@ -1,0 +1,110 @@
+version: '3.3'
+
+services:
+
+  setup:
+    build:
+      context: setup/
+      args:
+        ELASTIC_VERSION: ${ELASTIC_VERSION}
+    init: true
+    volumes:
+      - setup:/state:Z
+    environment:
+      ELASTIC_PASSWORD: ${ELASTIC_PASSWORD:-}
+      LOGSTASH_INTERNAL_PASSWORD: ${LOGSTASH_INTERNAL_PASSWORD:-}
+      KIBANA_SYSTEM_PASSWORD: ${KIBANA_SYSTEM_PASSWORD:-}
+    depends_on:
+      - elasticsearch
+
+  db:
+    image: postgres:12.8
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_USER: ADADkuNdxmPnWTR2
+      POSTGRES_PASSWORD: fFyqWFVkUKDAUbWD
+      POSTGRES_DB: testdb
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+  pgadmin:
+    image: dpage/pgadmin4
+    depends_on:
+      - db
+    ports:
+      - 5555:80
+    environment:
+      PGADMIN_DEFAULT_EMAIL: jonas@rotert.online
+      PGADMIN_DEFAULT_PASSWORD: YvaxA7bEkkSRhTDs
+    restart: unless-stopped
+
+  app:
+    image: genealogy-backend:1.0.0
+    depends_on:
+      - db
+    volumes:
+        - ./logs:/var/app/logs
+    ports:
+      - 8080:8080
+    restart: always
+
+  elasticsearch:
+    build:
+      context: elasticsearch/
+      args:
+        ELASTIC_VERSION: ${ELASTIC_VERSION}
+    ports:
+      - 9200:9200
+      - 9300:9300
+    volumes:
+      - ./elasticsearch/config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml:ro
+      - elasticsearch_data:/usr/share/elasticsearch/data
+    environment:
+      ES_JAVA_OPTS: -Xms512m -Xmx512m
+      # Bootstrap password.
+      # Used to initialize the keystore during the initial startup of
+      # Elasticsearch. Ignored on subsequent runs.
+      ELASTIC_PASSWORD: ${ELASTIC_PASSWORD:-}
+      # Use single node discovery in order to disable production mode and avoid bootstrap checks.
+      # see: https://www.elastic.co/guide/en/elasticsearch/reference/current/bootstrap-checks.html
+      discovery.type: single-node
+
+  logstash:
+    build:
+      context: logstash/
+      args:
+        ELASTIC_VERSION: ${ELASTIC_VERSION}
+    ports:
+      - 5044:5044
+      - 5000:5000
+      - 9600:9600
+    environment:
+      LS_JAVA_OPTS: -Xms256m -Xmx256m
+      LOGSTASH_INTERNAL_PASSWORD: ${LOGSTASH_INTERNAL_PASSWORD:-}
+    depends_on:
+      - elasticsearch
+    volumes:
+        - ./logstash/config/logstash.yml:/usr/share/logstash/config/logstash.yml:ro,Z
+        - ./logstash/pipeline:/usr/share/logstash/pipeline:ro,Z
+        - ./logs:/tmp
+
+  kibana:
+    build:
+      context: kibana/
+      args:
+        ELASTIC_VERSION: ${ELASTIC_VERSION}
+    ports:
+      - 5601:5601
+    volumes:
+      - ./kibana/config/kibana.yml:/usr/share/kibana/config/kibana.yml:ro,Z
+    environment:
+      KIBANA_SYSTEM_PASSWORD: ${KIBANA_SYSTEM_PASSWORD:-}
+    depends_on:
+      - elasticsearch
+
+volumes:
+  setup:
+  db_data:
+  elasticsearch_data:

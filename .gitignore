@@ -38,3 +38,5 @@ genealogy-importer/src/main/.DS_Store
 .DS_Store
 .classpath
 .project
+genealogy-backend/logs
+*.graphml

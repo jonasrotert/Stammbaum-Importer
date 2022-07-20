@@ -1,5 +1,7 @@
 package de.jonasrotert.stammbaum.api.controller;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,8 +14,10 @@ import de.jonasrotert.stammbaum.api.service.GraphService;
 public class GraphController
 {
 
+    private static final Log LOGGER = LogFactory.getLog(GraphController.class);
+
     @Autowired
-    private GraphService graphService;
+    private GraphService     graphService;
 
     @GetMapping("/load")
     @CrossOrigin
